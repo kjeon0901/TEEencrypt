@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2016, Linaro Limited
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
 #include <err.h>
 #include <stdio.h>
 #include <string.h>
@@ -35,16 +8,20 @@
 /* To the the UUID (found the the TA's h-file(s)) */
 #include <TEEencrypt_ta.h>
 
-int main(void)
-{
-	TEEC_Result res;
-	TEEC_Context ctx;
-	TEEC_Session sess;
-	TEEC_Operation op;
-	TEEC_UUID uuid = TA_TEEencrypt_UUID;
-	uint32_t err_origin;
+TEEC_Result res;
+TEEC_Context ctx;
+TEEC_Session sess;
+TEEC_Operation op;
+TEEC_UUID uuid = TA_TEEencrypt_UUID;
+uint32_t err_origin;
 
-	
+char argv_option[10];
+char argv_filename[100];
+char argv_filedata[100];
+FILE *file;
+
+int main(int argc, char *argv[])
+{
 	res = TEEC_InitializeContext(NULL, &ctx);
 	
 	res = TEEC_OpenSession(&ctx, &sess, &uuid,
@@ -52,13 +29,34 @@ int main(void)
 	
 	memset(&op, 0, sizeof(op));
 
-	
+
+	if(argc < 3){
+		printf("Not enough parameter. \n");
+		return 0;
+	}
+
+	strcpy(argv_option, argv[1]);
+	strcpy(argv_filename, argv[2]);
+
 	op.paramTypes = TEEC_PARAM_TYPES(TEEC_VALUE_INOUT, TEEC_NONE,
 					 TEEC_NONE, TEEC_NONE);
 	op.params[0].value.a = 42;
-
-
 	printf("Invoking TA to increment %d\n", op.params[0].value.a);
+
+	file = fopen(argv_filename, "r");
+		fgets(argv_filedata, sizeof(argv_filedata), file);
+
+	if(strcmp(argv_option, "-e") == 0){
+		printf(".....Encryption Start.....");
+
+	}
+	else if(strcmp(argv_option, "-d") == 0){
+		printf(".....Decryption Start.....");
+
+	}
+
+	
+	
 	
 	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_ENC_VALUE, &op,
 				 &err_origin);
@@ -67,6 +65,7 @@ int main(void)
 	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_RANDOMKEY_GET, &op,
 				 &err_origin);
 
+	fclose(file);
 
 	TEEC_CloseSession(&sess);
 
@@ -74,3 +73,4 @@ int main(void)
 
 	return 0;
 }
+
