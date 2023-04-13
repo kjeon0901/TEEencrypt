@@ -19,6 +19,23 @@ char argv_option[10];
 char argv_filename[100];
 char argv_filedata[100];
 FILE *file;
+int len=100;
+
+void send_request_for_encryption(void){
+	char ciphertext [100] = {0,};
+	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_ENC_VALUE, &op,
+				 &err_origin);
+	memcpy(ciphertext, op.params[0].tmpref.buffer, len);
+	printf("Ciphertext : %s\n", ciphertext);
+}
+
+void send_request_for_decryption(void){
+	char plaintext [100] = {0,};
+	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_DEC_VALUE, &op,
+				 &err_origin);
+	memcpy(plaintext, op.params[0].tmpref.buffer, len);
+	printf("Plaintext : %s\n", plaintext);
+}
 
 int main(int argc, char *argv[])
 {
@@ -42,28 +59,32 @@ int main(int argc, char *argv[])
 					 TEEC_NONE, TEEC_NONE);
 	op.params[0].value.a = 42;
 	printf("Invoking TA to increment %d\n", op.params[0].value.a);
+	op.params[0].tmpref.buffer = argv_filedata;
+	op.params[0].tmpref.size = len;
 
 	file = fopen(argv_filename, "r");
-		fgets(argv_filedata, sizeof(argv_filedata), file);
+	fgets(argv_filedata, sizeof(argv_filedata), file);
+	memcpy(op.params[0].tmpref.buffer, argv_filedata, len);
 
 	if(strcmp(argv_option, "-e") == 0){
 		printf(".....Encryption Start.....");
-
+		send_request_for_encryption(); // CA -> TA send request for encryption
 	}
 	else if(strcmp(argv_option, "-d") == 0){
 		printf(".....Decryption Start.....");
-
+		send_request_for_decryption(); // CA -> TA send request to decryption
 	}
 
 	
 	
-	
+	/*
 	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_ENC_VALUE, &op,
 				 &err_origin);
 	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_DEC_VALUE, &op,
 				 &err_origin);
 	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_RANDOMKEY_GET, &op,
 				 &err_origin);
+	*/
 
 	fclose(file);
 
