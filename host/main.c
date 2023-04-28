@@ -39,6 +39,15 @@ void send_request_for_encryption(void){
 	FILE *e_file = fopen(encrypted_filename, "w");
 	fputs(ciphertext, e_file);
 	fclose(e_file);
+
+	char char_key[20];
+	sprintf(char_key, "%d\n", encrypt_key);
+
+	char key_filename[20] = "k_";
+	strcat(key_filename, argv_filename);
+	FILE *k_file = fopen(key_filename, "w");
+	fputs(char_key, k_file);
+	fclose(k_file);
 }
 
 void send_request_for_decryption(void){
