@@ -24,16 +24,14 @@ int len=100;
 void send_request_for_encryption(void){
 	unsigned int encrypt_key;
 	char ciphertext [100] = {0,};
+	
 	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_ENC_VALUE, &op,
 				 &err_origin);
-	if (res!=TEEC_SUCCESS) 
-		errx(1, "TEEC_InvokeCommand failed with code 0x%x origin 0x%x", res, err_origin);
 	
 	memcpy(ciphertext, op.params[0].tmpref.buffer, len);
-	printf("Ciphertext : %s\n", ciphertext);
+	printf("Ciphertext : %s", ciphertext);
 
-	//encrypt_key = op.params[1].value.a;
-	encrypt_key = 3;
+	encrypt_key = op.params[1].value.a;
 	printf("Encrypt_Key : %d\n", encrypt_key);
 
 	char encrypted_filename[20] = "e_";
@@ -85,11 +83,11 @@ int main(int argc, char *argv[])
 	memcpy(op.params[0].tmpref.buffer, argv_filedata, len);
 
 	if(strcmp(argv_option, "-e") == 0){
-		printf(".....option for encryption.....");
+		printf(".....option for encryption.....\n");
 		send_request_for_encryption(); // CA -> TA send request for encryption
 	}
 	else if(strcmp(argv_option, "-d") == 0){
-		printf(".....option for decryption.....");
+		printf(".....option for decryption.....\n");
 		send_request_for_decryption(); // CA -> TA send request to decryption
 	}
 
