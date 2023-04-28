@@ -93,11 +93,11 @@ int main(int argc, char *argv[])
 
 	if(strcmp(argv_option, "-e") == 0){
 		printf(".....option for encryption.....\n");
-		send_request_for_encryption(); // CA -> TA send request for encryption
+		send_request_for_encryption(); 
 	}
 	else if(strcmp(argv_option, "-d") == 0){
 		printf(".....option for decryption.....\n");
-		send_request_for_decryption(); // CA -> TA send request to decryption
+		send_request_for_decryption();
 	}
 
 	
