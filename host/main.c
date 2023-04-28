@@ -32,7 +32,7 @@ void send_request_for_encryption(void){
 	printf("Ciphertext : %s", ciphertext);
 
 	encrypt_key = op.params[1].value.a;
-	printf("Encrypt_Key : %d\n", encrypt_key);
+	printf("encrypt_key : %d\n", encrypt_key);
 
 	char encrypted_filename[20] = "e_";
 	strcat(encrypted_filename, argv_filename);
