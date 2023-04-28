@@ -45,7 +45,8 @@ int main(int argc, char *argv[])
 			       TEEC_LOGIN_PUBLIC, NULL, NULL, &err_origin);
 	
 	memset(&op, 0, sizeof(op));
-
+	op.paramTypes = TEEC_PARAM_TYPES(TEEC_VALUE_INOUT, TEEC_NONE,
+					 TEEC_NONE, TEEC_NONE);
 
 	if(argc < 3){
 		printf("Not enough parameter. \n");
@@ -55,23 +56,26 @@ int main(int argc, char *argv[])
 	strcpy(argv_option, argv[1]);
 	strcpy(argv_filename, argv[2]);
 
-	op.paramTypes = TEEC_PARAM_TYPES(TEEC_VALUE_INOUT, TEEC_NONE,
-					 TEEC_NONE, TEEC_NONE);
-	op.params[0].value.a = 42;
-	printf("Invoking TA to increment %d\n", op.params[0].value.a);
+	if(strcmp(argv_option, "-d") == 0)
+		strcpy(argv_filename, argv[3]);
+
+	op.paramTypes = TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_OUTPUT, TEEC_VALUE_INOUT,
+					 TEEC_NONE, TEEC_NONE);	
 	op.params[0].tmpref.buffer = argv_filedata;
 	op.params[0].tmpref.size = len;
 
 	file = fopen(argv_filename, "r");
 	fgets(argv_filedata, sizeof(argv_filedata), file);
+	fclose(file);
+
 	memcpy(op.params[0].tmpref.buffer, argv_filedata, len);
 
 	if(strcmp(argv_option, "-e") == 0){
-		printf(".....Encryption Start.....");
+		printf(".....option for encryption.....");
 		send_request_for_encryption(); // CA -> TA send request for encryption
 	}
 	else if(strcmp(argv_option, "-d") == 0){
-		printf(".....Decryption Start.....");
+		printf(".....option for decryption.....");
 		send_request_for_decryption(); // CA -> TA send request to decryption
 	}
 
@@ -86,7 +90,6 @@ int main(int argc, char *argv[])
 				 &err_origin);
 	*/
 
-	fclose(file);
 
 	TEEC_CloseSession(&sess);
 

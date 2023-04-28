@@ -2,7 +2,8 @@
 #include <tee_internal_api_extensions.h>
 
 #include <TEEencrypt_ta.h>
-
+#include <string.h>
+int key;
 /*
  * Called when the instance of the TA is created. This is the first call in
  * the TA.
@@ -84,6 +85,39 @@ static TEE_Result enc_value(uint32_t param_types,
 	params[0].value.a++;
 	IMSG("Increase value to: %u", params[0].value.a);
 
+	char * in = (char *)params[0].memref.buffer;
+	int in_len = strlen (params[0].memref.buffer);
+	char encrypted [64]={0,};
+	
+	unsigned int encrypt_key;
+	TEE_GenerateRandom(&encrypt_key, sizeof(encrypt_key));
+	encrypt_key = encrypt_key % 26;
+	printf("encrypt_key: %d\n", encrypt_key);
+	
+
+	DMSG("========================Encryption========================\n");
+	DMSG ("Plaintext :  %s", in);
+	memcpy(encrypted, in, in_len);
+	
+	for(int i=0; i<in_len;i++){
+		if(encrypted[i]>='a' && encrypted[i] <='z'){
+			encrypted[i] -= 'a';
+			encrypted[i] += encrypt_key;
+			encrypted[i] = encrypted[i] % 26;
+			encrypted[i] += 'a';
+		}
+		else if (encrypted[i] >= 'A' && encrypted[i] <= 'Z') {
+			encrypted[i] -= 'A';
+			encrypted[i] += encrypt_key;
+			encrypted[i] = encrypted[i] % 26;
+			encrypted[i] += 'A';
+		}
+	}
+	
+	DMSG ("Ciphertext :  %s", encrypted);
+	memcpy(in, encrypted, in_len);
+	params[1].value.a = encrypt_key + key;
+
 	return TEE_SUCCESS;
 }
 
@@ -116,7 +150,7 @@ TEE_Result TA_InvokeCommandEntryPoint(void __maybe_unused *sess_ctx,
 			uint32_t param_types, TEE_Param params[4])
 {
 	(void)&sess_ctx; /* Unused parameter */
-
+	key = 3;
 	switch (cmd_id) {
 	case TA_TEEencrypt_CMD_ENC_VALUE:
 		return enc_value(param_types, params);
