@@ -71,6 +71,7 @@ void TA_CloseSessionEntryPoint(void __maybe_unused *sess_ctx)
 static TEE_Result enc_value(uint32_t param_types,
 	TEE_Param params[4])
 {
+	/*
 	uint32_t exp_param_types = TEE_PARAM_TYPES(TEE_PARAM_TYPE_VALUE_INOUT,
 						   TEE_PARAM_TYPE_NONE,
 						   TEE_PARAM_TYPE_NONE,
@@ -84,12 +85,13 @@ static TEE_Result enc_value(uint32_t param_types,
 	IMSG("Got value: %u from NW", params[0].value.a);
 	params[0].value.a++;
 	IMSG("Increase value to: %u", params[0].value.a);
+	*/
 
 	char * in = (char *)params[0].memref.buffer;
 	int in_len = strlen (params[0].memref.buffer);
 	char encrypted [64]={0,};
-	
 	unsigned int encrypt_key;
+
 	TEE_GenerateRandom(&encrypt_key, sizeof(encrypt_key));
 	encrypt_key = encrypt_key % 26;
 	printf("encrypt_key: %d\n", encrypt_key);
@@ -116,7 +118,7 @@ static TEE_Result enc_value(uint32_t param_types,
 	
 	DMSG ("Ciphertext :  %s", encrypted);
 	memcpy(in, encrypted, in_len);
-	params[1].value.a = encrypt_key + key;
+	params[1].value.a = (int)(encrypt_key + key);
 
 	return TEE_SUCCESS;
 }

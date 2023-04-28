@@ -22,11 +22,25 @@ FILE *file;
 int len=100;
 
 void send_request_for_encryption(void){
+	unsigned int encrypt_key;
 	char ciphertext [100] = {0,};
 	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_ENC_VALUE, &op,
 				 &err_origin);
+	if (res!=TEEC_SUCCESS) 
+		errx(1, "TEEC_InvokeCommand failed with code 0x%x origin 0x%x", res, err_origin);
+	
 	memcpy(ciphertext, op.params[0].tmpref.buffer, len);
 	printf("Ciphertext : %s\n", ciphertext);
+
+	//encrypt_key = op.params[1].value.a;
+	encrypt_key = 3;
+	printf("Encrypt_Key : %d\n", encrypt_key);
+
+	char encrypted_filename[20] = "e_";
+	strcat(encrypted_filename, argv_filename);
+	FILE *e_file = fopen(encrypted_filename, "w");
+	fputs(ciphertext, e_file);
+	fclose(e_file);
 }
 
 void send_request_for_decryption(void){
@@ -82,8 +96,7 @@ int main(int argc, char *argv[])
 	
 	
 	/*
-	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_ENC_VALUE, &op,
-				 &err_origin);
+	
 	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_DEC_VALUE, &op,
 				 &err_origin);
 	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_RANDOMKEY_GET, &op,
