@@ -114,7 +114,7 @@ static TEE_Result dec_value(uint32_t param_types,
 	char decrypted [64]={0,};
 	unsigned int decrypt_key;
 
-	decrypt_key = 3; // not complete
+	decrypt_key = params[1].value.a;
 	printf("decrypt_key: %d\n", decrypt_key);
 	
 
