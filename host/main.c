@@ -37,7 +37,7 @@ void send_request_for_encryption(void){
 	encrypt_key = op.params[1].value.a;
 	printf("encrypt_key : %d\n", encrypt_key);
 
-	char encrypted_filename[20] = "e_";
+	char encrypted_filename[20] = "cipher_";
 	strcat(encrypted_filename, argv_filename);
 	FILE *e_file = fopen(encrypted_filename, "w");
 	fputs(ciphertext, e_file);
@@ -46,7 +46,7 @@ void send_request_for_encryption(void){
 	char char_key[20];
 	sprintf(char_key, "%d\n", encrypt_key);
 
-	char encrypted_key_filename[20] = "k_";
+	char encrypted_key_filename[20] = "key_";
 	strcat(encrypted_key_filename, argv_filename);
 	FILE *k_file = fopen(encrypted_key_filename, "w");
 	fputs(char_key, k_file);
@@ -70,7 +70,7 @@ void send_request_for_decryption(void){
 	printf("Plaintext : %s", plaintext);	
 	printf("decrypt_key : %d\n", op.params[1].value.a);
 
-	char decrypted_filename[20] = "d_";
+	char decrypted_filename[20] = "decrypted_";
 	strcat(decrypted_filename, argv_filename);
 	FILE *d_file = fopen(decrypted_filename, "w");
 	fputs(plaintext, d_file);
@@ -109,7 +109,6 @@ int main(int argc, char *argv[])
 	fclose(file);
 
 	
-
 	if(strcmp(argv_option, "-e") == 0){
 		printf(".....option for encryption.....\n");
 		send_request_for_encryption(); 
@@ -118,12 +117,6 @@ int main(int argc, char *argv[])
 		printf(".....option for decryption.....\n");
 		send_request_for_decryption();
 	}
-
-	
-	/*
-	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_RANDOMKEY_GET, &op,
-				 &err_origin);
-	*/
 
 
 	TEEC_CloseSession(&sess);

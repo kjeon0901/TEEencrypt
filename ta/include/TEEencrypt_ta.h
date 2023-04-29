@@ -39,6 +39,5 @@
 /* The function IDs implemented in this TA */
 #define TA_TEEencrypt_CMD_ENC_VALUE		0
 #define TA_TEEencrypt_CMD_DEC_VALUE		1
-#define TA_TEEencrypt_CMD_RANDOMKEY_GET		2
 
 #endif /*TA_TEEencrypt_H*/
