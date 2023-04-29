@@ -56,6 +56,12 @@ void send_request_for_decryption(void){
 				 &err_origin);
 	memcpy(plaintext, op.params[0].tmpref.buffer, len);
 	printf("Plaintext : %s\n", plaintext);
+
+	char decrypted_filename[20] = "d_";
+	strcat(decrypted_filename, argv_filename);
+	FILE *d_file = fopen(decrypted_filename, "w");
+	fputs(plaintext, d_file);
+	fclose(d_file);
 }
 
 int main(int argc, char *argv[])
@@ -77,8 +83,8 @@ int main(int argc, char *argv[])
 	strcpy(argv_option, argv[1]);
 	strcpy(argv_filename, argv[2]);
 
-	if(strcmp(argv_option, "-d") == 0)
-		strcpy(argv_filename, argv[3]);
+	//if(strcmp(argv_option, "-d") == 0)
+	//	strcpy(argv_filename, argv[3]);
 
 	op.paramTypes = TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_OUTPUT, TEEC_VALUE_INOUT,
 					 TEEC_NONE, TEEC_NONE);	
@@ -101,11 +107,7 @@ int main(int argc, char *argv[])
 	}
 
 	
-	
 	/*
-	
-	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_DEC_VALUE, &op,
-				 &err_origin);
 	res = TEEC_InvokeCommand(&sess, TA_TEEencrypt_CMD_RANDOMKEY_GET, &op,
 				 &err_origin);
 	*/
