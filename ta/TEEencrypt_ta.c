@@ -14,7 +14,7 @@ int encrypt_random_key(unsigned int key){
 }
 
 int decrypt_random_key(unsigned int cipher_key){
-	inr res = cipher_key - root_key;
+	int res = cipher_key - root_key;
 	return res;
 }
 

@@ -37,7 +37,7 @@ void send_request_for_encryption(void){
 	encrypt_key = op.params[1].value.a;
 	//printf("root_key+random_key : %d, ", encrypt_key);
 
-	char encrypted_filename[20] = "cipher_";
+	char encrypted_filename[100] = "cipher_";
 	strcat(encrypted_filename, argv_filename);
 	FILE *e_file = fopen(encrypted_filename, "w");
 	fputs(ciphertext, e_file);
@@ -46,7 +46,7 @@ void send_request_for_encryption(void){
 	char char_key[20];
 	sprintf(char_key, "%d\n", encrypt_key);
 
-	char encrypted_key_filename[20] = "key_";
+	char encrypted_key_filename[100] = "key_";
 	strcat(encrypted_key_filename, argv_filename);
 	FILE *k_file = fopen(encrypted_key_filename, "w");
 	fputs(char_key, k_file);
@@ -70,7 +70,7 @@ void send_request_for_decryption(void){
 	printf("Plaintext : %s", plaintext);	
 	//printf("decrypt_key : %d\n", op.params[1].value.a);
 
-	char decrypted_filename[20] = "decrypted_";
+	char decrypted_filename[100] = "decrypted_";
 	strcat(decrypted_filename, argv_filename);
 	FILE *d_file = fopen(decrypted_filename, "w");
 	fputs(plaintext, d_file);
