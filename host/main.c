@@ -35,7 +35,7 @@ void send_request_for_encryption(void){
 	printf("Ciphertext : %s", ciphertext);
 
 	encrypt_key = op.params[1].value.a;
-	printf("encrypt_key : %d\n", encrypt_key);
+	//printf("root_key+random_key : %d, ", encrypt_key);
 
 	char encrypted_filename[20] = "cipher_";
 	strcat(encrypted_filename, argv_filename);
@@ -68,7 +68,7 @@ void send_request_for_decryption(void){
 
 	memcpy(plaintext, op.params[0].tmpref.buffer, len);
 	printf("Plaintext : %s", plaintext);	
-	printf("decrypt_key : %d\n", op.params[1].value.a);
+	//printf("decrypt_key : %d\n", op.params[1].value.a);
 
 	char decrypted_filename[20] = "decrypted_";
 	strcat(decrypted_filename, argv_filename);

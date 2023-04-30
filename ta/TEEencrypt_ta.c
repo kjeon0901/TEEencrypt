@@ -2,6 +2,22 @@
 #include <tee_internal_api_extensions.h>
 #include <TEEencrypt_ta.h>
 #include <string.h>
+int root_key;
+
+void init_root_key(int key){
+	root_key = key;
+}
+
+int encrypt_random_key(unsigned int key){
+	int res = key + root_key;
+	return res;
+}
+
+int decrypt_random_key(unsigned int cipher_key){
+	inr res = cipher_key - root_key;
+	return res;
+}
+
 
 /*
  * Called when the instance of the TA is created. This is the first call in
@@ -77,7 +93,7 @@ static TEE_Result enc_value(uint32_t param_types,
 
 	TEE_GenerateRandom(&encrypt_key, sizeof(encrypt_key));
 	encrypt_key = encrypt_key % 26;
-	printf("encrypt_key: %d\n", encrypt_key);
+	printf("random_key : %d\n", encrypt_key);
 	
 
 	DMSG("========================Encryption========================\n");
@@ -101,7 +117,8 @@ static TEE_Result enc_value(uint32_t param_types,
 	
 	DMSG ("Ciphertext :  %s", encrypted);
 	memcpy(in, encrypted, in_len);
-	params[1].value.a = (int)encrypt_key;
+	params[1].value.a = encrypt_random_key(encrypt_key);
+	printf("encrypted_random_key : %d", params[1].value.a);
 
 	return TEE_SUCCESS;
 }
@@ -112,10 +129,10 @@ static TEE_Result dec_value(uint32_t param_types,
 	char * in = (char *)params[0].memref.buffer;
 	int in_len = strlen (params[0].memref.buffer);
 	char decrypted [64]={0,};
-	unsigned int decrypt_key;
+	int decrypt_key;
 
-	decrypt_key = params[1].value.a;
-	printf("decrypt_key: %d\n", decrypt_key);
+	decrypt_key = decrypt_random_key(params[1].value.a);
+	printf("get random_key : %d\n", decrypt_key);
 	
 
 	DMSG("========================Decryption========================\n");
@@ -153,6 +170,8 @@ TEE_Result TA_InvokeCommandEntryPoint(void __maybe_unused *sess_ctx,
 			uint32_t cmd_id,
 			uint32_t param_types, TEE_Param params[4])
 {
+	init_root_key(9);
+
 	(void)&sess_ctx; /* Unused parameter */
 	switch (cmd_id) {
 	case TA_TEEencrypt_CMD_ENC_VALUE:
