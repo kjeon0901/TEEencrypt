@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 
 	if(argc < 3){
 		printf("Not enough parameter. \n");
-		return 0;
+		exit(1);
 	}
 
 	strcpy(argv_option, argv[1]);
@@ -108,7 +108,6 @@ int main(int argc, char *argv[])
 	fgets(argv_filedata, sizeof(argv_filedata), file);
 	fclose(file);
 
-	
 	if(strcmp(argv_option, "-e") == 0){
 		printf(".....option for encryption.....\n");
 		send_request_for_encryption(); 
@@ -117,7 +116,6 @@ int main(int argc, char *argv[])
 		printf(".....option for decryption.....\n");
 		send_request_for_decryption();
 	}
-
 
 	TEEC_CloseSession(&sess);
 
